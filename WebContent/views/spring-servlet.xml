@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+xmlns:context="http://www.springframework.org/schema/context" 
+xmlns:mvc="http://www.springframework.org/schema/mvc" 
+xmlns:p="http://www.springframework.org/schema/p" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring"   
+xsi:schemaLocation="http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd     
+http://www.springframework.org/schema/context 
+http://www.springframework.org/schema/context/spring-context-3.0.xsd    
+http://www.springframework.org/schema/mvc 
+http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+<!-- 
+http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring 
+http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">   -->
+	
+	
+	<context:component-scan base-package="com.arya.spring.jee.demo" />
+	<context:annotation-config />
+	<context:component-scan base-package="com.arya.spring.jee.demo.CustomIdentifier"/>
+   <mvc:annotation-driven  />
+ <!--     <ehcache:annotation-driven cache-manager="cacheManager" />  --> 
+    
+    
+	<!-- ******************************* ***** CACHE CONFIGURATION ***** ******************************* -->
+  <!--    <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">   
+         <property name="configLocation" value="/WEB-INF/ehcache.xml" />    
+    </bean>  -->
+<!--    	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+		<property name="cacheManager" ref="ehcache" />
+	</bean>
+	<bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation" value="classpath:config/ehcache.xml" />
+		<property name="shared" value="true" />
+	</bean>  -->
+		
+
+	
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/views/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3306/rvkbangalore" />
+		<property name="username" value="root" />
+		<property name="password" value="letsdomysql" />
+		 
+		 <!--may I  ehcache -->
+		
+		<!-- 	HowTo configure the C3P0 connection pool -->	
+		
+	</bean>
+
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="annotatedClasses">
+			<list>
+				<value>com.arya.spring.jee.demo.dto.RegDTO</value>
+				<value>com.arya.spring.jee.demo.dto.FilePropertiseDTO</value>
+			</list>
+		</property>
+
+	<property name="hibernateProperties">
+		<props>
+			<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+			<prop key="hibernate.show_sql">true</prop>
+			<prop key="hibernate.hbm2ddl.auto">update</prop>
+		
+			<!-- HowTo configure the C3P0 connection pool -->
+			<prop key="hibernate.connection.Provider_class">org.hibernate.c3p0.internal.C3P0ConnectionProvider</prop>
+			<prop key="hibernate.c3p0.min_size">5</prop>
+			<prop key="hibernate.c3p0.max_size">53</prop>
+			<prop key="hibernate.c3p0.timeout">100</prop>
+			<prop key="hibernate.c3p0.max_statements">50</prop>
+			<prop key="hibernate.c3p0.idle_test_period">1000</prop>
+			<prop key="hibernate.c3p0.validate">true</prop>  
+			
+		<prop key="cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>
+ 		<prop key="cache.provider_class">net.sf.ehcache.hibernate.EhCacheProvider</prop>
+  		<prop key="cache.use_second_level_cache">true</prop>
+		<prop key="cache.use_query_cache">false</prop> 
+		
+		</props>
+	</property>
+	</bean>
+	
+ 
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="20971520" />
+		<property name="maxInMemorySize" value="1048576" />
+	</bean> 	
+
+
+	<bean
+	class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+	<property name="exceptionMappings">
+		<props>
+			<prop key="java.lang.Exception">error</prop>
+		</props>
+	</property>
+</bean>
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="smtp.gmail.com" />
+		<property name="port" value="25" />
+		<property name="username" value="mithleshjee1490@gmail.com" />
+		<property name="password" value="9934733945" />
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.transport.protocol">smtp</prop>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.starttls.enable">true</prop>
+				<prop key="mail.debug">true</prop>
+				<prop key="mail.smtp.ssl.enable">false</prop>
+				<prop key="mail.smtp.socketFactory.fallback">true</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- You can have some pre-configured messagess also which are ready to 
+		send -->
+	<bean id="preConfiguredMessage" class="org.springframework.mail.SimpleMailMessage">
+		<property name="to" value="mithleshjee1490@gmail.com"></property>
+		<property name="from" value="mithleshjee1490@gmail.com"></property>
+		<property name="subject" value="FATAL - Application crash. Save your job !!" />
+	</bean>
+
+</beans>
